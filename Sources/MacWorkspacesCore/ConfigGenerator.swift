@@ -49,11 +49,7 @@ public struct ConfigGenerator: Sendable {
         add("automatically-unhide-macos-hidden-apps = false")
         add()
         add("# Nine numbered AeroSpace virtual workspaces (separate from macOS Spaces).")
-        let names = Action.workspaceNumbers.map { n -> String in
-            let label = settings.displayName(forWorkspace: String(n))
-            return label.map { "\(n)=\($0)" } ?? "\(n)"
-        }
-        add("# Display names (companion only): \(names.joined(separator: ", "))")
+        add("# Display names are stored by the companion app, not here.")
         add("persistent-workspaces = [\(Action.workspaceNumbers.map { "\"\($0)\"" }.joined(separator: ", "))]")
         add()
         add("key-mapping.preset = 'qwerty'")

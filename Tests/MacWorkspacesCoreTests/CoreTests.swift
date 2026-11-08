@@ -292,6 +292,25 @@ final class LaunchGateTests: XCTestCase {
         XCTAssertTrue(gate.shouldAccept(at: t0.addingTimeInterval(6)))
     }
 
+    func testBrokenKeyProbeDegradesToTimingSuppression() {
+        // A probe that always reports "released" re-arms immediately; the sliding window
+        // must still swallow a stream of 30 ms repeats.
+        let gate = LaunchGate(observesKeyState: true)
+        var accepted = 0
+        for i in 0..<40 {
+            if gate.shouldAccept(at: t0.addingTimeInterval(Double(i) * 0.03)) { accepted += 1 }
+            gate.keyReleased()
+        }
+        XCTAssertEqual(accepted, 1)
+    }
+
+    func testRecorderKeyCodesRoundTrip() {
+        for (name, code) in KeyNames.virtualKeyCodes {
+            XCTAssertTrue(KeyNames.isValid(name), name)
+            XCTAssertEqual(KeyNames.keyName(forVirtualKeyCode: code), name)
+        }
+    }
+
     func testTimingFallbackSuppressesRepeatStream() {
         let gate = LaunchGate(observesKeyState: false)
         XCTAssertTrue(gate.shouldAccept(at: t0))

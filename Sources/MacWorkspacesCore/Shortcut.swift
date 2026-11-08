@@ -96,8 +96,16 @@ public enum KeyNames {
         "l": 0x25, "j": 0x26, "quote": 0x27, "k": 0x28, "semicolon": 0x29, "backslash": 0x2A,
         "comma": 0x2B, "slash": 0x2C, "n": 0x2D, "m": 0x2E, "period": 0x2F, "tab": 0x30,
         "space": 0x31, "backtick": 0x32, "backspace": 0x33, "esc": 0x35, "keypadEnter": 0x4C,
-        "left": 0x7B, "right": 0x7C, "down": 0x7D, "up": 0x7E,
+        "left": 0x7B, "right": 0x7C, "down": 0x7D, "up": 0x7E, "sectionSign": 0x0A,
+        "forwardDelete": 0x75, "home": 0x73, "end": 0x77, "pageUp": 0x74, "pageDown": 0x79,
+        "f1": 0x7A, "f2": 0x78, "f3": 0x63, "f4": 0x76, "f5": 0x60, "f6": 0x61, "f7": 0x62,
+        "f8": 0x64, "f9": 0x65, "f10": 0x6D, "f11": 0x67, "f12": 0x6F,
     ]
+
+    /// Reverse lookup used by the shortcut recorder.
+    public static func keyName(forVirtualKeyCode code: UInt16) -> String? {
+        virtualKeyCodes.first(where: { $0.value == code })?.key
+    }
 }
 
 /// A key combination such as `cmd-enter` or `alt-shift-h`.
