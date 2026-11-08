@@ -12,7 +12,7 @@ mac-workspaces is a small menu bar companion for [AeroSpace](https://nikitabobko
 
 See [prd.md](prd.md) for the product requirements and [docs/VALIDATION.md](docs/VALIDATION.md) for the on-device acceptance checklist.
 
-> Status: pre-alpha (milestones 1–3 of the PRD). The code compiles and the core logic is unit-tested. The end-to-end acceptance scenarios still need to be run on a Mac with AeroSpace installed (see [docs/VALIDATION.md](docs/VALIDATION.md)).
+> Status: private alpha. Validated on macOS 26.2 with AeroSpace 0.21.3-Beta: 45 unit tests, and 27 of 27 end-to-end checks through real AeroSpace bindings (`scripts/e2e.sh`). Two PRD scenarios still need a manual run: launching with Terminal quit, and permission denied. See [docs/VALIDATION.md](docs/VALIDATION.md).
 
 ## Default shortcuts
 
@@ -64,7 +64,7 @@ The app appears in the menu bar and opens Setup on first launch:
                                    ▼
                      mac-workspaces (menu bar app)
                        1. ignore auto-repeat (launch key still held → drop)
-                       2. note the focused workspace
+                       2. use the workspace captured at press time (passed in the URL)
                        3. tell Terminal: do script ""  (always a new window)
                        4. wait for AeroSpace to report the window; move it back if it
                           landed in another workspace; focus it
@@ -72,7 +72,7 @@ The app appears in the menu bar and opens Setup on first launch:
 
 - **One owner for global shortcuts.** Every binding lives in the AeroSpace config. The companion registers no hotkeys of its own, so restarting it can't duplicate handlers.
 - **Terminal control belongs to the companion.** Because the launch goes through the URL scheme, macOS attributes the Automation permission to mac-workspaces, not to AeroSpace or `osascript`.
-- **Auto-repeat.** AeroSpace runs a binding for every key-down event, including repeats. After it accepts a launch, the companion ignores requests until the launch key is physically released. A 110 ms sliding window is a second safeguard.
+- **Auto-repeat.** AeroSpace's hotkeys fire once per physical press (verified: a 2 s hold produces one trigger). As a second layer, after it accepts a launch the companion ignores requests until the launch key is physically released, with a 110 ms sliding window on top.
 - **Pause** switches AeroSpace into a `paused` binding mode that has no bindings (unless you assign a resume shortcut). Product shortcuts stop intercepting keys, and tiling keeps working. `aerospace enable off` was not used because it also stops window management and moves windows out of hidden workspaces.
 - **Workspace indicator** listens to `aerospace subscribe` events and also polls every 2 s. Polling catches window closes and recovers after AeroSpace restarts.
 
@@ -101,6 +101,8 @@ If both AeroSpace config locations exist, the app refuses to write. AeroSpace tr
 swift build                 # debug build
 swift test                  # unit tests for MacWorkspacesCore (no AeroSpace needed)
 swift run MacWorkspaces --print-config   # print the config generated from your settings
+MacWorkspaces --apply-config             # write it (refuses hand-written configs without --force; backs up first)
+scripts/e2e.sh                           # end-to-end checks against live AeroSpace (uses empty workspaces 6–9)
 scripts/bundle.sh           # build/MacWorkspaces.app (ad-hoc signed)
 ```
 
