@@ -121,7 +121,10 @@ public enum Action: Hashable, Codable, Sendable, CustomStringConvertible {
         case .launchTerminal: return "exec-and-forget \(launchCommand)"
         // `stop` keeps focus in place at a layout edge (the PRD requirement); it is
         // AeroSpace's default, written explicitly so the intent survives edits.
-        case .focus(let d): return "focus --boundaries workspace --boundaries-action stop \(d.rawValue)"
+        // --ignore-floating: AeroSpace 0.21.3-Beta can trap (crash) in `focus` while temporarily
+        // re-inserting floating windows into the tiling tree (makeFloatingWindowsSeenAsTiling).
+        // Observed on-device; floating windows stay reachable with the mouse or the menu.
+        case .focus(let d): return "focus --ignore-floating --boundaries workspace --boundaries-action stop \(d.rawValue)"
         case .move(let d): return "move \(d.rawValue)"
         case .switchWorkspace(let n): return "workspace \(n)"
         // No --focus-follows-window: the user stays in the current workspace.

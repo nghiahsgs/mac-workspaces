@@ -209,7 +209,7 @@ final class AppModel: ObservableObject {
     // MARK: Terminal launch
 
     /// Handles `macworkspaces://launch-terminal` (sent by the AeroSpace binding) and the menu item.
-    func requestTerminalLaunch(fromMenu: Bool = false) {
+    func requestTerminalLaunch(fromMenu: Bool = false, pressedOnWorkspace: String? = nil) {
         // Menu clicks cannot auto-repeat; only filter keyboard-originated requests.
         if !fromMenu {
             guard gate.shouldAccept() else { return }
@@ -220,7 +220,7 @@ final class AppModel: ObservableObject {
         // Capture the active workspace immediately (cheap), then queue the slower launch so
         // rapid presses are handled one at a time and in order.
         captureQueue.async {
-            let target = launcher.currentWorkspace()
+            let target = pressedOnWorkspace ?? launcher.currentWorkspace()
             launchQueue.async {
                 do {
                     let result = try launcher.launch(targetWorkspace: target)

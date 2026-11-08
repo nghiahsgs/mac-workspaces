@@ -89,7 +89,8 @@ public extension AeroSpaceControlling {
         _ = try run(["move-node-to-workspace", "--window-id", String(id), workspace])
     }
 
-    func focusWindow(_ id: Int) throws { _ = try run(["focus", "--window-id", String(id)]) }
+    /// `--ignore-floating` avoids an AeroSpace 0.21.3-Beta crash path (see Action.focus).
+    func focusWindow(_ id: Int) throws { _ = try run(["focus", "--ignore-floating", "--window-id", String(id)]) }
 }
 
 public enum AeroSpaceParsing {

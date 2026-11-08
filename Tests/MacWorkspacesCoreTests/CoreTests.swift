@@ -51,7 +51,7 @@ final class ActionTests: XCTestCase {
 
     func testFocusStopsAtEdge() {
         XCTAssertEqual(Action.focus(.up).aerospaceCommand(launchCommand: "", pausedMode: ""),
-                       "focus --boundaries workspace --boundaries-action stop up")
+                       "focus --ignore-floating --boundaries workspace --boundaries-action stop up")
     }
 
     func testCLIArguments() {
@@ -141,9 +141,16 @@ final class ConfigGeneratorTests: XCTestCase {
         XCTAssertTrue(output.contains("default-root-container-orientation = 'auto'"))
     }
 
+    func testLaunchCommandCapturesWorkspaceAtPressTime() {
+        let cmd = ConfigGenerator.launchCommand(aerospacePath: "/opt/homebrew/bin/aerospace")
+        XCTAssertEqual(cmd, #"/usr/bin/open -g "macworkspaces://launch-terminal?workspace=$(/opt/homebrew/bin/aerospace list-workspaces --focused)""#)
+        let out = ConfigGenerator(launchCommand: cmd).render(Settings())
+        // No single quotes inside, so it renders as a TOML literal string.
+        XCTAssertTrue(out.contains(#"cmd-enter = 'exec-and-forget /usr/bin/open -g "macworkspaces://launch-terminal?workspace=$(/opt/homebrew/bin/aerospace list-workspaces --focused)"'"#))
+    }
+
     func testBindings() {
-        XCTAssertTrue(output.contains("cmd-enter = \"exec-and-forget /usr/bin/open -g 'macworkspaces://launch-terminal'\""))
-        XCTAssertTrue(output.contains("alt-h = 'focus --boundaries workspace --boundaries-action stop left'"))
+        XCTAssertTrue(output.contains("alt-h = 'focus --ignore-floating --boundaries workspace --boundaries-action stop left'"))
         XCTAssertTrue(output.contains("alt-shift-3 = 'move-node-to-workspace 3'"))
         XCTAssertTrue(output.contains("alt-slash = 'layout tiles horizontal vertical'"))
         XCTAssertTrue(output.contains("alt-minus = 'resize smart -50'"))
@@ -377,7 +384,7 @@ final class TerminalLauncherTests: XCTestCase {
         let r = try makeLauncher(a, t).launch(targetWorkspace: "1")
         XCTAssertEqual(r.windowID, 7)
         XCTAssertEqual(r.placement, .inTarget)
-        XCTAssertTrue(a.log.contains(["focus", "--window-id", "7"]))
+        XCTAssertTrue(a.log.contains(["focus", "--ignore-floating", "--window-id", "7"]))
         XCTAssertEqual(t.opened, 1)
     }
 
@@ -392,7 +399,7 @@ final class TerminalLauncherTests: XCTestCase {
         let r = try makeLauncher(a, t).launch(targetWorkspace: "2")
         XCTAssertEqual(r.placement, .corrected(from: "5"))
         XCTAssertTrue(a.log.contains(["move-node-to-workspace", "--window-id", "9", "2"]))
-        XCTAssertFalse(a.log.contains(["focus", "--window-id", "9"]), "does not yank the user back")
+        XCTAssertFalse(a.log.contains(["focus", "--ignore-floating", "--window-id", "9"]), "does not yank the user back")
         XCTAssertEqual(a.windows.first?.workspace, "2")
     }
 

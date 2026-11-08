@@ -14,7 +14,18 @@ public struct ConfigGenerator: Sendable {
     /// so the companion — not AeroSpace — owns the Terminal Automation permission, the
     /// auto-repeat filter, and workspace placement checks. `-g` keeps the companion in the
     /// background.
-    public static let defaultLaunchCommand = "/usr/bin/open -g '\(AppPaths.urlScheme)://launch-terminal'"
+    ///
+    /// The focused workspace is captured inside the binding, at press time, and passed in the
+    /// URL. AeroSpace gives `exec-and-forget` no workspace context for hotkeys, and by the
+    /// time the URL reaches the companion (~100 ms) a quick workspace switch may already
+    /// have happened.
+    public static func launchCommand(aerospacePath: String) -> String {
+        "/usr/bin/open -g \"\(AppPaths.urlScheme)://launch-terminal?workspace=$(\(aerospacePath) list-workspaces --focused)\""
+    }
+
+    public static var defaultLaunchCommand: String {
+        launchCommand(aerospacePath: AeroSpaceCLI.locate()?.path ?? "/opt/homebrew/bin/aerospace")
+    }
 
     public var launchCommand: String
 

@@ -49,8 +49,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard let string = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
               let url = URL(string: string), url.scheme == AppPaths.urlScheme else { return }
         switch url.host {
-        case "launch-terminal": model.requestTerminalLaunch()
+        case "launch-terminal":
+            let workspace = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "workspace" })?.value
+                .flatMap { $0.isEmpty ? nil : $0 }
+            model.requestTerminalLaunch(pressedOnWorkspace: workspace)
         case "refresh": model.refreshWorkspaces()
+        case "toggle-pause": model.togglePause()
         case "settings": showSettings()
         case "setup": showSetup()
         default: break
