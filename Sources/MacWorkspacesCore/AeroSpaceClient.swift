@@ -73,7 +73,8 @@ public extension AeroSpaceControlling {
 
     func windows(appBundleID: String) throws -> [WindowInfo] {
         let out = try run([
-            "list-windows", "--all", "--app-bundle-id", appBundleID,
+            // `--all` accepts no filters; `--monitor all` is its documented equivalent that does.
+            "list-windows", "--monitor", "all", "--app-bundle-id", appBundleID,
             "--format", AeroSpaceParsing.windowFormat,
         ])
         return AeroSpaceParsing.windows(out)

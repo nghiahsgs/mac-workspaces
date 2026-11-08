@@ -20,9 +20,13 @@ codesign --verify --verbose=2 "$APP"
 echo "Built $APP"
 
 if [[ "${1:-}" == "--install" ]]; then
+  LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
   rm -rf /Applications/MacWorkspaces.app
   cp -R "$APP" /Applications/
-  # Re-register so the macworkspaces:// URL scheme points at the installed copy.
-  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MacWorkspaces.app
+  # Only the installed copy may handle macworkspaces:// — otherwise LaunchServices can keep
+  # routing ⌘Return to a stale build/ copy with the same bundle id.
+  "$LSREGISTER" -u "$PWD/$APP" 2>/dev/null || true
+  rm -rf "$APP"
+  "$LSREGISTER" -f /Applications/MacWorkspaces.app
   echo "Installed /Applications/MacWorkspaces.app"
 fi

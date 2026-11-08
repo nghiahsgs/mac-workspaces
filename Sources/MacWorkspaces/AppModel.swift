@@ -99,6 +99,18 @@ final class AppModel: ObservableObject {
     func checkAutomation(ask: Bool) {
         let bundleID = terminal.bundleIdentifier
         DispatchQueue.global().async {
+            // macOS can only answer (or prompt) while the target app is running.
+            if ask, NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).isEmpty,
+               let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
+                let config = NSWorkspace.OpenConfiguration()
+                config.activates = false
+                NSWorkspace.shared.openApplication(at: url, configuration: config)
+                let deadline = Date().addingTimeInterval(5)
+                while NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first?.isFinishedLaunching != true,
+                      Date() < deadline {
+                    Thread.sleep(forTimeInterval: 0.1)
+                }
+            }
             let status = Automation.status(bundleID: bundleID, ask: ask)
             DispatchQueue.main.async { self.automationStatus = status }
         }
@@ -280,9 +292,22 @@ final class WorkspaceMonitor {
         p.standardError = FileHandle.nullDevice
         pipe.fileHandleForReading.readabilityHandler = { [weak self] handle in
             if handle.availableData.isEmpty { handle.readabilityHandler = nil; return }
-            DispatchQueue.main.async { self?.onChange() }
+            DispatchQueue.main.async { self?.scheduleCoalescedChange() }
         }
         do { try p.run(); process = p } catch { process = nil }
+    }
+
+    private var pendingChange: DispatchWorkItem?
+
+    /// Focus events can arrive in bursts; refresh at most once per 100 ms burst.
+    private func scheduleCoalescedChange() {
+        guard pendingChange == nil else { return }
+        let work = DispatchWorkItem { [weak self] in
+            self?.pendingChange = nil
+            self?.onChange()
+        }
+        pendingChange = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: work)
     }
 
     deinit {

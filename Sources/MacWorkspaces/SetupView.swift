@@ -50,6 +50,7 @@ struct SetupView: View {
                     Text("Status: \(model.automationStatus.label)").foregroundStyle(model.automationStatus == .denied ? .red : .secondary)
                     HStack {
                         Button("Request Permission") { model.checkAutomation(ask: true) }
+                            .help("Opens Terminal if needed; macOS only asks while Terminal is running.")
                         Button("Automation Settings…") { SystemSettings.openAutomation() }
                     }
                 }

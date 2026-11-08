@@ -341,6 +341,10 @@ final class FakeAeroSpace: AeroSpaceControlling, @unchecked Sendable {
         case "list-workspaces" where arguments.contains("--focused"): return focused + "\n"
         case "list-workspaces": return Set(windows.map(\.workspace)).sorted().joined(separator: "\n")
         case "list-windows":
+            // Mirror AeroSpace's CLI grammar: `--all` cannot be combined with filters.
+            if arguments.contains("--all") && arguments.contains("--app-bundle-id") {
+                throw AeroSpaceError.commandFailed(command: arguments.joined(separator: " "), status: 2, output: "--all is incompatible with filters")
+            }
             let out = windows.map { "\($0.id)\t\($0.workspace)\t\($0.appBundleID)" }.joined(separator: "\n")
             onListWindows?()
             return out
@@ -430,6 +434,13 @@ final class ParsingTests: XCTestCase {
             WindowInfo(id: 12, workspace: "1", appBundleID: "com.apple.Terminal"),
             WindowInfo(id: 13, workspace: "2", appBundleID: "com.apple.Terminal"),
         ])
+    }
+
+    func testWindowQueryUsesValidArguments() throws {
+        let a = FakeAeroSpace()
+        _ = try a.windows(appBundleID: "com.apple.Terminal")
+        XCTAssertEqual(a.log.last, ["list-windows", "--monitor", "all", "--app-bundle-id", "com.apple.Terminal",
+                                    "--format", "%{window-id}%{tab}%{workspace}%{tab}%{app-bundle-id}"])
     }
 
     func testSnapshot() throws {

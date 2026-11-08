@@ -2,7 +2,7 @@
 
 The PRD requires these checks on a real Mac. None of them have been run yet. During development, AeroSpace was deliberately **not installed** on the build machine, because it takes over global shortcuts. What has been verified so far:
 
-- `swift build`, `swift test` (43 unit tests) and `scripts/bundle.sh` succeed on macOS 26.2 with Xcode 26.6, on Apple silicon.
+- `swift build`, `swift test` (44 unit tests) and `scripts/bundle.sh` succeed on macOS 26.2 with Xcode 26.6, on Apple silicon.
 - The generated config parses as valid TOML. AeroSpace itself has not loaded it yet.
 - The app launches as a menu bar app without crashing.
 
