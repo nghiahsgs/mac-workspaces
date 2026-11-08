@@ -62,7 +62,7 @@ struct SetupView: View {
                     Button("Change Shortcuts…", action: onOpenSettings)
                 }
 
-                step(5, "Apply the AeroSpace configuration", done: model.configPlan?.state == .managedUnchanged) {
+                step(5, "Apply the AeroSpace configuration", done: model.configPlan.map { $0.state == .managedUnchanged && !$0.hasChanges } ?? false) {
                     ConfigStatusView(showingDiff: $showingDiff)
                 }
 

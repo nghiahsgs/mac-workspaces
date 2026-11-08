@@ -80,6 +80,8 @@ final class AppModel: ObservableObject {
             let version = snap == nil ? nil : (try? aerospace.version())
             DispatchQueue.main.async {
                 if let snap { self.snapshot = snap }
+                // AeroSpace (re)appeared: retry the event subscription it may have refused.
+                if snap != nil && !self.aerospaceReachable { self.monitor?.resetBackoff() }
                 self.aerospaceReachable = snap != nil
                 if let version { self.aerospaceVersion = version }
             }
@@ -298,6 +300,11 @@ final class WorkspaceMonitor {
     }
 
     private var pendingChange: DispatchWorkItem?
+
+    func resetBackoff() {
+        quickExits = 0
+        if process?.isRunning != true { process = nil; startSubscription() }
+    }
 
     /// Focus events can arrive in bursts; refresh at most once per 100 ms burst.
     private func scheduleCoalescedChange() {
