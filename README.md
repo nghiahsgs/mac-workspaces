@@ -32,7 +32,8 @@ Option + letter shortcuts type special characters on some keyboard layouts. Setu
 
 ## Requirements
 
-- macOS 14 Sonoma or later. Apple silicon is the first validation target.
+- macOS 26 on Apple silicon (validated). It builds for macOS 14+, but 14–15 are untested.
+- AeroSpace 0.21.3-Beta (validated). See [docs/VALIDATION.md](docs/VALIDATION.md#supported-versions-alpha-selection).
 - [AeroSpace](https://nikitabobko.github.io/AeroSpace/guide): `brew install --cask nikitabobko/tap/aerospace`
 - Apple Terminal (other terminals are planned)
 - To build: Xcode 15 or later (Swift 5.10+)

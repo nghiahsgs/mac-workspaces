@@ -62,8 +62,19 @@ scripts/e2e.sh
 - When AeroSpace starts, it adopts every open window into the focused workspace. After installing it or restarting it, expect your existing windows to be together in one workspace.
 - Other window managers (for example Rectangle) can fight AeroSpace over window frames. Disable their shortcuts or quit them.
 
-## Open decisions
+## Supported versions (alpha selection)
 
-- **Minimum macOS:** set to 14 because of the SwiftUI APIs used. Validated only on 26.2.
-- **AeroSpace:** validated on 0.21.3-Beta. Needs `config-version = 2`, `subscribe`, `trigger-binding` (e2e only) and `--app-bundle-id`.
-- **Distribution:** the app is ad-hoc signed. Developer ID signing and notarization are still to be decided.
+| | Supported | Notes |
+| --- | --- | --- |
+| macOS | **26 (Tahoe)**, Apple silicon | The only validated combination. 14–15 build (deployment target 14) but are unsupported until tested |
+| AeroSpace | **0.21.3-Beta** | Needs `config-version = 2`, `subscribe`, `--app-bundle-id`. Older versions are unsupported |
+| Terminal | Apple Terminal | Other terminals are a later extension (PRD) |
+| Displays | One display | Monitor connect/disconnect not yet validated |
+| Keyboard | US layout | Non-US layouts not validated. Setup warns about Option-key conflicts and every shortcut can be rebound |
+| Intel | Unsupported | Not tested |
+| Distribution | Build from source, ad-hoc signed | Developer ID signing and notarization are deferred to the first public release |
+
+## Still to validate before widening support
+
+- ⌘ Return with Terminal quit (S5), and the permission-denied path. Both need a person at the Mac.
+- Non-US layouts (e.g. German, Vietnamese Telex), monitor connect/disconnect, Intel, macOS 14/15.
