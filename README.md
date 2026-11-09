@@ -47,6 +47,8 @@ scripts/bundle.sh --install      # builds and copies MacWorkspaces.app to /Appli
 open /Applications/MacWorkspaces.app
 ```
 
+> **Before the first launch:** when AeroSpace starts, it tiles every window that is already open. With many windows open, the screen splits into many small tiles at once. Close windows you don't need first, or run Setup and apply the configuration before you start AeroSpace. Quitting AeroSpace stops the tiling.
+
 The app appears in the menu bar and opens Setup on first launch:
 
 1. **Install AeroSpace** if it is missing.
@@ -113,3 +115,12 @@ scripts/bundle.sh           # build/MacWorkspaces.app (ad-hoc signed)
 Not covered by the MVP: terminal tabs and panes, tmux, native macOS Spaces, session restoration, themes, sync and telemetry.
 
 This is an independent project inspired by Omarchy. The working name and visual identity are provisional.
+
+## Credits
+
+- [AeroSpace](https://github.com/nikitabobko/AeroSpace) by Nikita Bobko does all tiling and workspace management. mac-workspaces only calls the `aerospace` CLI and writes its config. It does not include or redistribute AeroSpace code. AeroSpace is MIT licensed.
+- Keyboard workflow inspired by [Omarchy](https://omarchy.org).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
